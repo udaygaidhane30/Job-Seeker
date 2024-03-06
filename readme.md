@@ -1,7 +1,5 @@
 # JOB SEEKER
 
----
-
 Behold our groundbreaking project, a masterpiece of technology that graciously offers to email recruiters and inquire if, by some miraculous chance, they might have a job opportunity available at their esteemed firms. Because who wouldn't want an algorithm to handle such delicate matters?
 
 ---
