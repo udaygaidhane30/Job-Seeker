@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+import os.path
+import pandas as pd
+import time
+
+YOUR_MAIL = 'name@domain.com'                   # Your email id to send mail from.
+YOUR_NAME = 'Vijay Salgaonkar'                  # Your name set in your email account.
+PASSWORD = 'Do_Aur_teen_october'                # email account password.
+ATTACHMENT_LOCATION = './your_resume.pdf'       # file path to your resume.
+EXCEL_FILE_PATH = './Recruiter_data.xlsx'       # file path to recuiter mail data.
+MAIL_TIME_INTERVAL = 40                         # mail interval time in minutes.
+MAIL_PER_DAY = 10                               # Number of mails per day.
+SMTP_HOST_ADDRESS = 'smtp-mail.outlook.com'     # Your smtp server host address, this is for outlook. 
+
+def get_email_body(reciever_name, company_name):
+    email_template = f"Hello {reciever_name},\nI am intrested to work for your {company_name}. Do let me know.\n\nRegards,\nYour Fellow Developer
+"
+    return email_template
+
+def get_email_subject():
+    return "Inquiry Regarding Job Openings"
+
+
+def send_email(email_recipient, reciever_name, company_name, attachment_location = ''):
+    msg = MIMEMultipart()
+    msg['From'] = f"{YOUR_NAME} <{YOUR_MAIL}>"
+    msg['To'] = email_recipient
+    email_subject = get_email_subject()
+    msg['Subject'] = email_subject
+    
+    email_message = get_email_body(reciever_name, company_name)
+    
+    msg.attach(MIMEText(email_message, 'plain'))
+    
+    if attachment_location != '':
+        filename = os.path.basename(attachment_location)
+        attachment = open(attachment_location, "rb")
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition',
+                        "attachment; filename= %s" % filename)
+        msg.attach(part)
+        
+    try:
+        server = smtplib.SMTP(SMTP_HOST_ADDRESS, 587)
+        server.ehlo()
+        server.starttls()
+        server.login(YOUR_MAIL, PASSWORD)
+        text = msg.as_string()
+        server.sendmail(YOUR_MAIL, email_recipient, text)
+        server.quit()
+    except:
+        print("SMPT server connection error")
+        return False
+    return True
+
+
+def process_excel_file(file_path):
+    df = pd.read_excel(file_path)
+
+    undefined_entries = df[df['status'].isna()].head(MAIL_PER_DAY)
+
+    for index, row in undefined_entries.iterrows():
+        reciever_name = row['name'].title()
+        reciever_email = row['email']
+        company_name = row['company_name'].title()
+        
+        
+        print(f'Sending mail to {reciever_name} at {reciever_email}')
+        email_status = send_email(reciever_email, reciever_name, company_name, ATTACHMENT_LOCATION)
+        
+        if email_status:
+            df.at[index, 'status'] = 'sent'
+            print(f"Email sent successfully to {reciever_email}")
+        else:
+            df.at[index, 'status'] = 'failed'
+            print(f"Failed to send email to {reciever_email}.")
+                
+
+        time.sleep(MAIL_TIME_INTERVAL * 60)
+
+    df.to_excel(file_path, index=False)
+    
+process_excel_file(EXCEL_FILE_PATH)
+
+ 
