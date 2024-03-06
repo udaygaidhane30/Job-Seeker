@@ -4,13 +4,17 @@ Behold our groundbreaking project, a masterpiece of technology that graciously o
 
 ---
 
+` pip3 install pandas`
+
+---
+
 ## Required Data
 
 - **YOUR_MAIL**: Your mailId
 - **YOUR_NAME**: Your name to send name with
 - **PASSWORD**: Your Email password (keep it in local _or I might track your history_)
-- **ATTACHMENT_LOCATION**: file path of your resume (_better to store in same folder_).
-- **EXCEL_FILE_PATH**: file path to recruiter data (_please do follow the template Recruiter_data.xlsx_)
+- **ATTACHMENT_LOCATION**: absolute file path of your resume (_better to store in same folder_).
+- **EXCEL_FILE_PATH**: absolute file path to recruiter data (_please do follow the template Recruiter_data.xlsx_)
 - **MAIL_TIME_INTERVAL**: After how many minutes you want to send the email (keeping this to ensure uninteruped smtp connection and I have a speculation that mail account might get blocked if sent in small time interval).
 - **MAIL_PER_DAY**: No of mails you want to send per day (_It will read <=(less than equal to) top MAIL_PER_DAY entries from the xlsx where statussss is undefined_).
 - **SMTP_HOST_ADDRESS**: Address of your smtp server, you need to turn it on as smtp is disabled by default.
