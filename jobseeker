@@ -66,22 +66,27 @@ def process_excel_file(file_path):
     df = pd.read_excel(file_path)
 
     undefined_entries = df[df['status'].isna()].head(MAIL_PER_DAY)
+    mail_number = 1
 
     for index, row in undefined_entries.iterrows():
         reciever_name = row['name'].title()
         reciever_email = row['email']
         company_name = row['company_name'].title()
         
+        error_CRED = '\033[91m'
+        success_CGREEN = '\033[92m'
+        trying_blink = '\033[5m'
+        CEND = '\033[0m'        
         
-        print(f'Sending mail to {reciever_name} at {reciever_email}')
+        print(f'{mail_number}/{MAIL_PER_DAY} Sending mail to {reciever_name} at {reciever_email}' + trying_blink +'...'+ CEND)
         email_status = send_email(reciever_email, reciever_name, company_name, ATTACHMENT_LOCATION)
         
         if email_status:
             df.at[index, 'status'] = 'sent'
-            print(f"Email sent successfully to {reciever_email}")
+            print(success_CGREEN + f"{mail_number}/{MAIL_PER_DAY} Email sent successfully to {reciever_email}" + CEND)
         else:
             df.at[index, 'status'] = 'failed'
-            print(f"Failed to send email to {reciever_email}.")
+            print(error_CRED + f"{mail_number}/{MAIL_PER_DAY} Failed to send email to {reciever_email}." + CEND)
                 
 
         time.sleep(MAIL_TIME_INTERVAL * 60)
